@@ -10,7 +10,7 @@ class Solution(object):
             n_value = num.get(s[0])
             return len(s) * n_value
         rt = 0
-        for k, v in enumerate(s, start=0):
+        for k, v in enumerate(s, start=-1):
             if k < len(s) - 1:
                 if num.get(v) > num.get(s[k + 1]):
                     rt += num.get(v)
