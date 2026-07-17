@@ -28,7 +28,7 @@ class BucketBuilder(object):
                 raise TypeError("item must be an int")
             self.bucket.append(item)
             return self.bucket
-        except Exception as e:
+        except TypeError as e:
             print(e, file=sys.stderr)
 
     def remove_from_the_bucket(self, item: int) -> List[int]:
@@ -41,9 +41,17 @@ class BucketBuilder(object):
         Returns:
             list
         """
-        if item in self.bucket:
-            self.bucket = list(filter((item).__ne__, self.bucket))
-        return self.bucket
+        try:
+            if not isinstance(item, int):
+                raise TypeError("item must be an int")
+            if item not in self.bucket:
+                raise ValueError(f'{item} not in bucket list')
+            else:
+                self.bucket = list(filter((item).__ne__, self.bucket))
+            return self.bucket
+        except Exception as e:
+            print(e, file=sys.stderr)
+
 
 def process_bucket(i: Optional[int]=None, adding: str='yes') -> List[int]:
     """
@@ -72,10 +80,34 @@ from inspect import signature
 class TestBucketBuilder(unittest.TestCase):
     def setUp(self):
         self.bb = BucketBuilder()
+        self.add_item = self.bb.add_item_to_the_bucket
+        self.remove_item = self.bb.remove_from_the_bucket
 
     def test_bucketbuilder_attrs(self):
         self.assertTrue(hasattr(self.bb, 'bucket'))
         self.assertTrue(isinstance(self.bb.bucket, List))
+
+    def test_add_item_to_the_bucket(self):
+        self.assertIn('item', signature(self.add_item).parameters)
+        self.assertTrue(signature(self.add_item).return_annotation, List)
+        self.assertTrue(len(self.bb.bucket) < 1)
+        self.bb.add_item_to_the_bucket(5)
+        self.bb.add_item_to_the_bucket(67)
+        self.assertTrue(len(self.bb.bucket) == 2)
+        with self.assertRaises(TypeError):
+            self.bb.add_item_to_the_bucket('5')
+        self.assertTrue(len(self.bb.bucket) == 2)
+
+    def test_remove_from_the_bucket(self):
+        self.assertIn('item', signature(self.remove_item).parameters)
+        self.assertTrue(signature(self.remove_item).return_annotation, List)
+        self.bb.add_item_to_the_bucket(5)
+        self.bb.add_item_to_the_bucket(88)
+        self.bb.add_item_to_the_bucket(5)
+        self.bb.add_item_to_the_bucket(5)
+        self.assertTrue(len(self.bb.bucket) == 4)
+        self.bb.remove_from_the_bucket(5)
+        self.assertTrue(len(self.bb.bucket) == 1)
 
 if __name__ == '__main__':
     print("Hello, world")
