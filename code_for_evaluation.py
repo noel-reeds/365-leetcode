@@ -66,6 +66,17 @@ def process_bucket(i: Optional[int]=None, adding: str='yes') -> List[int]:
                 b.remove_from_the_bucket(i)
     return b.bucket # Return the final accumulated bucket contents
 
+import unittest, inspect
+from inspect import signature
+
+class TestBucketBuilder(unittest.TestCase):
+    def setUp(self):
+        self.bb = BucketBuilder()
+
+    def test_bucketbuilder_attrs(self):
+        self.assertTrue(hasattr(self.bb, 'bucket'))
+        self.assertTrue(isinstance(self.bb.bucket, List))
+
 if __name__ == '__main__':
     print("Hello, world")
     b = process_bucket(adding='yes')
